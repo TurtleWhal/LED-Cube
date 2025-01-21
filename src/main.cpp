@@ -8,19 +8,33 @@
 
 // Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
-// Example for NeoPixel Shield.  In this application we'd like to use it
-// as a 5x8 tall matrix, with the USB port positioned at the top of the
-// Arduino.  When held that way, the first pixel is at the top right, and
-// lines are arranged in columns, progressive order.  The shield uses
-// 800 KHz (v2) pixels that expect GRB color data.
-Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(8, 8, PIN,
-                                               NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
-                                                   NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
-                                               NEO_GRB + NEO_KHZ800);
+Adafruit_NeoMatrix disps[] = {
+    // Front, Right, Left, Top
+    Adafruit_NeoMatrix(8, 8, 1, // Front
+                       NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
+                           NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
+                       NEO_GRB + NEO_KHZ800),
+    Adafruit_NeoMatrix(8, 8, 3, // Right
+                       NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
+                           NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
+                       NEO_GRB + NEO_KHZ800),
+    Adafruit_NeoMatrix(8, 8, 13, // Left
+                       NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
+                           NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
+                       NEO_GRB + NEO_KHZ800),
+    Adafruit_NeoMatrix(8, 8, 15, // Top
+                       NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
+                           NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
+                       NEO_GRB + NEO_KHZ800),
+};
+
+#define Color(r, g, b) disps[0].Color(r, g, b)
 
 // Function to convert HSL to RGB
 uint16_t HSL(float h, float s, float l)
 {
+  h = fmod(h, 360.0);
+
   float c = (1.0 - abs(2.0 * l - 1.0)) * s;             // Chroma
   float x = c * (1.0 - abs(fmod(h / 60.0, 2.0) - 1.0)); // Intermediate value
   float m = l - c / 2.0;
@@ -64,20 +78,35 @@ uint16_t HSL(float h, float s, float l)
     b1 = x;
   }
 
-  return matrix.Color((r1 + m) * 255, (g1 + m) * 255, (b1 + m) * 255);
+  return Color((r1 + m) * 255, (g1 + m) * 255, (b1 + m) * 255);
 }
 
 void setup()
 {
-  matrix.begin();
-  matrix.show(); // Initialize all pixels to 'off'
-  matrix.setBrightness(50);
+  // Serial.begin(115200);
+  // Serial.println("Setup");
 
-  // matrix.drawPixel(1, 0, matrix.Color(255, 128, 0));
-  // matrix.show();
+  for (int i = 0; i < 4; i++)
+  {
+    disps[i].begin();
+    disps[i].setBrightness(50);
+    disps[i].show();
+  }
+
+  //* identify screens
+
+  // disps[0].fillRect(0, 0, 8, 8, Color(255, 0, 0));
+  // disps[0].show();
+
+  // disps[1].fillRect(0, 0, 8, 8, Color(0, 255, 0));
+  // disps[1].show();
+
+  // disps[2].fillRect(0, 0, 8, 8, Color(0, 0, 255));
+  // disps[2].show();
+
+  // disps[3].fillRect(0, 0, 8, 8, Color(255, 0, 255));
+  // disps[3].show();
 }
-
-int c = 0;
 
 void loop()
 {
@@ -122,23 +151,8 @@ void loop()
   //   matrix.show();
   //   delay(100);
   // }
-
-  for (int i = 0; i < 8; i++)
-  {
-    for (int j = 0; j < 8; j++)
-    {
-      // matrix.clear();
-      matrix.drawPixel(j, i, HSL(((i + j + c) * (360 / (7 + 7))) % 360, 1, 0.5)); // rgb
-      // matrix.drawPixel(j, i, matrix.ColorHSV(((i * j) * 4) * (65535 / 255))); // rgb
-      // matrix.drawPixel(j, i, matrix.ColorHSV((65535 / 64) * (i*8 + j), 255, 255)); //
-      // matrix.drawPixel(j, i, matrix.Color(random(0, 255), random(0, 255), random(0, 255))); // random
-    }
-  }
-
-  matrix.show();
-  delay(50);
-
-  c = c - 1 % 360;
-  if (c < 0)
-    c = 360;
+  
+  // #include "designs/rainbow.h"
+  #include "designs/breathing.h"
+  // #include "designs/rainbowborder.h"
 }
