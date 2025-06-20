@@ -1,4 +1,5 @@
 #include <Arduino.h>
+
 #include "Adafruit_NeoPixel.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_NeoMatrix.h"
@@ -8,27 +9,34 @@
 
 // Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, PIN, NEO_GRB + NEO_KHZ800);
 
-Adafruit_NeoMatrix disps[] = {
-    // Front, Right, Left, Top
-    Adafruit_NeoMatrix(8, 8, 1, // Front
-                       NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
-                           NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
-                       NEO_GRB + NEO_KHZ800),
-    Adafruit_NeoMatrix(8, 8, 3, // Right
-                       NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
-                           NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
-                       NEO_GRB + NEO_KHZ800),
-    Adafruit_NeoMatrix(8, 8, 13, // Left
-                       NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
-                           NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
-                       NEO_GRB + NEO_KHZ800),
-    Adafruit_NeoMatrix(8, 8, 15, // Top
-                       NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
-                           NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
-                       NEO_GRB + NEO_KHZ800),
-};
+Adafruit_NeoMatrix frontDisp = Adafruit_NeoMatrix(8, 8, 1,
+                                                  NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
+                                                      NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
+                                                  NEO_GRB + NEO_KHZ800);
 
-#define Color(r, g, b) disps[0].Color(r, g, b)
+Adafruit_NeoMatrix rightDisp = Adafruit_NeoMatrix(8, 8, 3,
+                                                  NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
+                                                      NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
+                                                  NEO_GRB + NEO_KHZ800);
+
+Adafruit_NeoMatrix leftDisp = Adafruit_NeoMatrix(8, 8, 13,
+                                                 NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
+                                                     NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
+                                                 NEO_GRB + NEO_KHZ800);
+
+Adafruit_NeoMatrix topDisp = Adafruit_NeoMatrix(8, 8, 15,
+                                                NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
+                                                    NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE,
+                                                NEO_GRB + NEO_KHZ800);
+
+// Front, Right, Left, Top
+Adafruit_NeoMatrix *disps[] = {
+    &frontDisp,
+    &rightDisp,
+    &leftDisp,
+    &topDisp};
+
+#define Color(r, g, b) disps[0]->Color(r, g, b)
 
 // Function to convert HSL to RGB
 uint16_t HSL(float h, float s, float l)
@@ -88,9 +96,9 @@ void setup()
 
   for (int i = 0; i < 4; i++)
   {
-    disps[i].begin();
-    disps[i].setBrightness(50);
-    disps[i].show();
+    disps[i]->begin();
+    disps[i]->setBrightness(50);
+    disps[i]->show();
   }
 
   //* identify screens
@@ -151,8 +159,8 @@ void loop()
   //   matrix.show();
   //   delay(100);
   // }
-  
-  // #include "designs/rainbow.h"
-  #include "designs/breathing.h"
+
+  #include "designs/rainbow.h"
+  // #include "designs/breathing.h"
   // #include "designs/rainbowborder.h"
 }
